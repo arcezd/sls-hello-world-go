@@ -55,7 +55,7 @@ Resources:
             Method: GET
             Path: /hello
             TimeoutInMillis: 15000
-            #PayloadFormatVersion: "2.0"
+            PayloadFormatVersion: "2.0"
             RouteSettings:
               ThrottlingBurstLimit: 600
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
