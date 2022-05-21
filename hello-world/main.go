@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -21,6 +22,11 @@ var (
 	ErrNon200Response = errors.New("non 200 response found")
 )
 
+type Greeting struct {
+	Message string `json:"message"`
+	Ip      string `json:"ip"`
+}
+
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	resp, err := http.Get(DefaultHTTPGetAddress)
 	if err != nil {
@@ -40,9 +46,28 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		return events.APIGatewayV2HTTPResponse{}, ErrNoIP
 	}
 
+	name := request.QueryStringParameters["name"]
+	if name == "" {
+		name = "World"
+	}
+
+	greeting := Greeting{
+		Message: fmt.Sprintf("Hello, %s", name),
+		Ip:      string(ip),
+	}
+
+	str, err := json.Marshal(greeting)
+
+	if err != nil {
+		return events.APIGatewayV2HTTPResponse{}, err
+	}
+
 	return events.APIGatewayV2HTTPResponse{
-		Body:       fmt.Sprintf("Hello, %v", string(ip)),
+		Body:       string(str),
 		StatusCode: 200,
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+		},
 	}, nil
 }
 
