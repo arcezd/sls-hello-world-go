@@ -146,3 +146,6 @@ Here are a few ideas that you can use to get more acquainted as to how this over
 Next, you can use the following resources to know more about beyond hello world samples and how others structure their Serverless applications:
 
 * [AWS Serverless Application Repository](https://aws.amazon.com/serverless/serverlessrepo/)
+
+## Useful links
+- [Amazon API Gateway - Working with HTTP APIs](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html)

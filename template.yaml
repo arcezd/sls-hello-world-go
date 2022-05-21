@@ -5,12 +5,41 @@ Description: >
   
   Sample SAM Template for go-al2
 
+Parameters:
+  StageName:
+    Type: String
+    Default: Prod
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 5
 
 Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref StageName
+      Tags:
+        Tag: Value
+      AccessLogSettings:
+        DestinationArn: !GetAtt AccessLogs.Arn
+        Format: $context.requestId
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 200
+      #RouteSettings:
+      #  "GET /path":
+      #    ThrottlingBurstLimit: 500 # overridden in HttpApi Event
+      RouteSettings:
+        "GET /hello":
+          ThrottlingBurstLimit: 500 # overridden in HttpApi Event
+      StageVariables:
+        StageVar: Value
+      FailOnWarnings: true
+  
+  AccessLogs:
+    Type: AWS::Logs::LogGroup
+  
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -19,11 +48,16 @@ Resources:
       Runtime: provided.al2
       Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
       Events:
-        CatchAll:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        ExplicitApi: # warning: creates a public endpoint
+          Type: HttpApi # More info about API Event Source: https://github.com/aws/serverless-application-model/blob/master/versions/2016-10-31.md#httpapi
           Properties:
-            Path: /hello
+            ApiId: !Ref HttpApi
             Method: GET
+            Path: /hello
+            TimeoutInMillis: 15000
+            #PayloadFormatVersion: "2.0"
+            RouteSettings:
+              ThrottlingBurstLimit: 600
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           PARAM1: VALUE
@@ -36,7 +70,7 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   HelloWorldAPI:
     Description: "API Gateway endpoint URL for Prod environment for First Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${StageName}/hello"
   HelloWorldFunction:
     Description: "First Lambda Function ARN"
     Value: !GetAtt HelloWorldFunction.Arn
