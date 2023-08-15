@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -37,7 +37,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		return events.APIGatewayV2HTTPResponse{}, ErrNon200Response
 	}
 
-	ip, err := ioutil.ReadAll(resp.Body)
+	ip, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return events.APIGatewayV2HTTPResponse{}, err
 	}
