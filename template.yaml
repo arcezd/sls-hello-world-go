@@ -15,6 +15,10 @@ Globals:
   Function:
     Timeout: 5
 
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+
 Resources:
   HttpApi:
     Type: AWS::Serverless::HttpApi
