@@ -50,6 +50,8 @@ Resources:
       CodeUri: hello-world/
       Handler: bootstrap
       Runtime: provided.al2
+      Architectures:
+      - x86_64
       Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
       Events:
         HelloWorld: # warning: creates a public endpoint
